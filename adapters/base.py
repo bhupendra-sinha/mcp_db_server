@@ -11,10 +11,6 @@ class DatabaseAdapter(ABC):
     - Production observability
     """
 
-    # -------------------------
-    # 🔌 Connection lifecycle
-    # -------------------------
-
     @abstractmethod
     def connect(self) -> None:
         """Initialize DB connection / client."""
@@ -30,10 +26,6 @@ class DatabaseAdapter(ABC):
         """Check if database is reachable."""
         pass
 
-    # -------------------------
-    # 🧠 Capability discovery (Agent uses this!)
-    # -------------------------
-
     @abstractmethod
     def capabilities(self) -> Dict[str, bool]:
         """
@@ -47,10 +39,6 @@ class DatabaseAdapter(ABC):
         }
         """
         pass
-
-    # -------------------------
-    # 📐 Schema & metadata
-    # -------------------------
 
     @abstractmethod
     def get_schema(self) -> Dict[str, Any]:
@@ -72,10 +60,6 @@ class DatabaseAdapter(ABC):
         """Return indexes for a table / collection."""
         pass
 
-    # -------------------------
-    # 🔍 Query execution
-    # -------------------------
-
     @abstractmethod
     def execute_query(
         self,
@@ -95,10 +79,6 @@ class DatabaseAdapter(ABC):
     def explain_query(self, query: Union[str, Dict[str, Any]]) -> Any:
         """Return query execution plan."""
         pass
-
-    # -------------------------
-    # ✍️ Controlled writes (optional but production-ready)
-    # -------------------------
 
     @abstractmethod
     def insert(self, table: str, data: Dict[str, Any]) -> Any:
@@ -121,10 +101,6 @@ class DatabaseAdapter(ABC):
     def delete(self, table: str, filters: Dict[str, Any]) -> Any:
         pass
 
-    # -------------------------
-    # 🔄 Transactions
-    # -------------------------
-
     @abstractmethod
     def begin_transaction(self) -> None:
         pass
@@ -137,10 +113,6 @@ class DatabaseAdapter(ABC):
     def rollback(self) -> None:
         pass
 
-    # -------------------------
-    # 📊 Aggregations & analytics
-    # -------------------------
-
     @abstractmethod
     def aggregate(
         self,
@@ -149,10 +121,6 @@ class DatabaseAdapter(ABC):
     ) -> Any:
         """SQL GROUP BY / Mongo pipeline."""
         pass
-
-    # -------------------------
-    # 🧾 Pagination & streaming
-    # -------------------------
 
     @abstractmethod
     def fetch_many(
@@ -163,18 +131,10 @@ class DatabaseAdapter(ABC):
         """Generator for large result sets."""
         pass
 
-    # -------------------------
-    # 🔐 Security & validation
-    # -------------------------
-
     @abstractmethod
     def validate_query(self, query: Union[str, Dict[str, Any]]) -> None:
         """Prevent unsafe operations."""
         pass
-
-    # -------------------------
-    # 🧩 Utilities
-    # -------------------------
 
     @abstractmethod
     def raw_client(self) -> Any:
@@ -183,16 +143,39 @@ class DatabaseAdapter(ABC):
 
 
 def create_adapter(db_type: str, db_url: str):
+    # Validate that connection string matches database type
+    db_url_lower = db_url.lower()
+    
     if db_type == "postgresql" or db_type == "postgres":
+        if not (db_url_lower.startswith("postgresql://") or db_url_lower.startswith("postgres://")):
+            raise ValueError(
+                f"Invalid connection string for PostgreSQL. "
+                f"Expected format: postgresql://user:password@host:5432/database"
+            )
         from adapters.postgresql_adapter import PostgresAdapter
         adapter = PostgresAdapter(db_url)
     elif db_type == "mysql":
+        if not db_url_lower.startswith("mysql"):
+            raise ValueError(
+                f"Invalid connection string for MySQL. "
+                f"Expected format: mysql+pymysql://user:password@host:3306/database"
+            )
         from adapters.mysql_adapter import MySQLAdapter
         adapter = MySQLAdapter(db_url)
     elif db_type == "mongodb" or db_type == "mongo":
+        if not db_url_lower.startswith("mongodb"):
+            raise ValueError(
+                f"Invalid connection string for MongoDB. "
+                f"Expected format: mongodb://user:password@host:27017/database or mongodb+srv://..."
+            )
         from adapters.mongo_adapter import MongoAdapter
         adapter = MongoAdapter(db_url)
     elif db_type == "sqlite":
+        if not db_url_lower.startswith("sqlite://"):
+            raise ValueError(
+                f"Invalid connection string for SQLite. "
+                f"Expected format: sqlite:///path/to/database.db"
+            )
         from adapters.sqlite_adapter import SQLiteAdapter
         adapter = SQLiteAdapter(db_url)
     else:

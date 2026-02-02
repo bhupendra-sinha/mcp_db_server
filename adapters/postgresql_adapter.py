@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.engine import Engine
 from typing import Any, Dict, List
 from adapters.base import DatabaseAdapter
+from security.validator import validate_sql
 
 
 class PostgresAdapter(DatabaseAdapter):
@@ -64,11 +65,7 @@ class PostgresAdapter(DatabaseAdapter):
     # ---------------- Query ----------------
 
     def validate_query(self, query: str) -> None:
-        forbidden = ["DROP", "DELETE", "TRUNCATE", "ALTER"]
-        q = query.upper()
-        for f in forbidden:
-            if f in q:
-                raise ValueError(f"Forbidden SQL operation: {f}")
+        validate_sql(query, allow_dml=False)
 
     def execute_query(self, query: str, *, params=None, limit=None):
         self.validate_query(query)

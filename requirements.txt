@@ -9,8 +9,16 @@ mcp>=1.26.0
 # =====================
 # Database Adapters
 # =====================
-sqlalchemy>=2.0.0
-psycopg2-binary>=2.9.0  # PostgreSQL
+sqlalchemy
+pymongo
+pymysql
+psycopg2-binary
+python-dotenv
+openai
+mcp
+fastapi
+uvicorn[standard]
+pydantic
 pymongo>=4.0.0          # MongoDB
 # mysql-connector-python>=8.0.0  # MySQL (uncomment if needed)
 

@@ -10,7 +10,7 @@ def main():
 
     mcp = create_server(adapter)
 
-    # 🚀 THIS ACTUALLY STARTS THE MCP SERVER
+    # INFO :- THIS ACTUALLY STARTS THE MCP SERVER
     mcp.run()
 
 

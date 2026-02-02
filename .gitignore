@@ -133,3 +133,6 @@ config.json
 secrets.json
 .env.local
 .env.*.local
+
+mcp_client.py
+cli.py
