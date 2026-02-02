@@ -1,0 +1,26 @@
+# MCP Database Server Requirements
+
+# =====================
+# Core MCP & FastMCP
+# =====================
+fastmcp>=2.14.0
+mcp>=1.26.0
+
+# =====================
+# Database Adapters
+# =====================
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0  # PostgreSQL
+pymongo>=4.0.0          # MongoDB
+# mysql-connector-python>=8.0.0  # MySQL (uncomment if needed)
+
+# =====================
+# AI & OpenAI
+# =====================
+openai>=1.99.0
+python-dotenv>=1.0.0
+
+# =====================
+# Utilities
+# =====================
+asyncpg>=0.29.0         # Async PostgreSQL support
