@@ -191,4 +191,4 @@ Always use the tools available to you. Do not just explain what the query does -
         return {"response": msg.content}
 
 
-client_manager = MCPClientManager()
+# client_manager = MCPClientManager()

@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from mcp_client import client_manager
+from mcp_client import MCPClientManager
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
+
+client_manager = MCPClientManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,7 +17,8 @@ app = FastAPI(title="MCP Database API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

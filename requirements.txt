@@ -18,6 +18,7 @@ openai
 mcp
 fastapi
 uvicorn[standard]
+gunicorn
 pydantic
 pymongo>=4.0.0          # MongoDB
 # mysql-connector-python>=8.0.0  # MySQL (uncomment if needed)
