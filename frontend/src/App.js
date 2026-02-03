@@ -25,7 +25,10 @@ function App() {
     setSuccess(null);
 
     try {
-      const result = await axios.post("/api/query", { query });
+      const result = await axios.post(
+        "https://mcpdbserver-production.up.railway.app/api/query",
+        { query },
+      );
       setResponse(result.data);
 
       // Check if response contains error or success message
@@ -56,10 +59,13 @@ function App() {
     setError(null);
 
     try {
-      const result = await axios.post("/api/connect", {
-        db_type: dbType,
-        db_url: dbUrl,
-      });
+      const result = await axios.post(
+        "https://mcpdbserver-production.up.railway.app/api/connect",
+        {
+          db_type: dbType,
+          db_url: dbUrl,
+        },
+      );
       setIsConnected(true);
       setDbInfo({ type: dbType, url: dbUrl });
       setResponse({ message: "Connected successfully!", ...result.data });
