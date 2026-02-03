@@ -18,8 +18,8 @@ app = FastAPI(title="MCP Database API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     # allow_origins=["http://localhost:3000"],
-    allow_origins=["https://stately-starlight-97a8e7.netlify.app"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
