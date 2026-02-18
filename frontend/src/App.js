@@ -9,7 +9,7 @@ import SuccessMessage from "./components/SuccessMessage";
 
 function App() {
   const [query, setQuery] = useState("");
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState(""); // 🔥 string instead of object
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -23,33 +23,54 @@ function App() {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setResponse(""); // reset previous response
 
     try {
-      const result = await axios.post(
-        "https://mcpdbserver-production.up.railway.app/api/query",
-        { query },
+      const res = await fetch(
+        "https://mcpdbserver-production.up.railway.app/query/stream",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query }),
+        },
       );
-      setResponse(result.data);
 
-      // Check if response contains error or success message
-      if (result.data.response) {
-        const responseText = result.data.response.toLowerCase();
-        if (responseText.includes("error") || responseText.includes("failed")) {
-          setError(result.data.response);
-        } else if (
-          responseText.includes("successfully") ||
-          responseText.includes("inserted") ||
-          responseText.includes("updated") ||
-          responseText.includes("deleted")
-        ) {
-          setSuccess(result.data.response);
+      if (!res.ok) {
+        throw new Error("Failed to fetch stream");
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop(); // preserve incomplete line
+
+        for (let line of lines) {
+          if (line.startsWith("data:")) {
+            const data = line.replace(/^data:\s?/, "");
+
+            if (data === "[DONE]") {
+              setLoading(false);
+              return;
+            }
+
+            // 🔥 Append token safely (no batching issue)
+            setResponse((prev) => prev + data);
+          }
         }
       }
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.detail || err.response?.data?.error || err.message;
-      setError(errorMsg);
-    } finally {
+      setError(err.message);
       setLoading(false);
     }
   };
@@ -66,6 +87,7 @@ function App() {
           db_url: dbUrl,
         },
       );
+
       setIsConnected(true);
       setDbInfo({ type: dbType, url: dbUrl });
       setResponse({ message: "Connected successfully!", ...result.data });
@@ -80,7 +102,7 @@ function App() {
   const handleDisconnect = () => {
     setIsConnected(false);
     setDbInfo(null);
-    setResponse(null);
+    setResponse("");
     setError(null);
     setQuery("");
   };
@@ -135,7 +157,7 @@ function App() {
             </div>
           )}
 
-          {response && !loading && <ResponseDisplay response={response} />}
+          {response && <ResponseDisplay response={response} />}
         </div>
       </div>
     </div>

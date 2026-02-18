@@ -52,13 +52,22 @@ async def connect(request: ConnectRequest):
         raise HTTPException(status_code=400, detail=error_msg)
 
 
-@app.post("/api/query")
-async def query(request: QueryRequest):
-    try:
-        result = await client_manager.process_query(request.query)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# @app.post("/api/query")
+# async def query(request: QueryRequest):
+#     try:
+#         result = await client_manager.process_query(request.query)
+#         return result
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
+from fastapi.responses import StreamingResponse
+
+@app.post("/query/stream")
+async def stream_query(payload: QueryRequest):
+    return StreamingResponse(
+        client_manager.process_query_stream(payload.query),
+        media_type="text/event-stream",
+    )
 
 
 @app.get("/api/status")
